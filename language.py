@@ -1,6 +1,5 @@
 import sys
 
-import lexer
 import parser
 import ast
 
@@ -12,10 +11,8 @@ def entry_point(argv):
         code = f.read()
         f.close()
 
-        stream = lexer.lexer.lex(code)
-        ast_tree = parser.parser.parse(stream)
+        ast_tree = parser.parse(code)
         print ast.compile(ast_tree)
-        # print ast_tree
 
     return 1
 
@@ -23,7 +20,6 @@ def entry_point(argv):
 def target(driver, args):
     driver.exe_name = 'language'
     return entry_point, None
-
 
 
 
