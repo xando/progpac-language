@@ -7,19 +7,19 @@ def parse(code):
 
 
 def test_step():
-    ast_tree = parse("""
+    _ast = parse("""
     s
     """)
 
-    assert ast_tree.lines[0] == ast.Line([
+    assert _ast.lines[0] == ast.Line([
         ast.Step('s')
     ])
 
-    ast_tree = parse("""
+    _ast = parse("""
     ss
     """)
 
-    assert ast_tree.lines[0] == ast.Line([
+    assert _ast.lines[0] == ast.Line([
         ast.Step('s'),
         ast.Step('s')
     ])
@@ -27,16 +27,16 @@ def test_step():
 
 def test_lines_step():
 
-    ast_tree = parse("""
+    _ast = parse("""
     ss
     rl
     """)
 
-    assert ast_tree.lines[0] == ast.Line([
+    assert _ast.lines[0] == ast.Line([
         ast.Step('s'),
         ast.Step('s')
     ])
-    assert ast_tree.lines[1] == ast.Line([
+    assert _ast.lines[1] == ast.Line([
         ast.Step('r'),
         ast.Step('l')
     ])
@@ -65,17 +65,17 @@ def test_lines_variable():
 
 def test_func_call():
 
-    ast_tree = parse("""
+    _ast = parse("""
     f
     """)
 
-    assert ast_tree.lines[0] == ast.Line([ast.FuncCall('f')])
+    assert _ast.lines[0] == ast.Line([ast.FuncCall('f')])
 
-    ast_tree = parse("""
+    _ast = parse("""
     sfs
     """)
 
-    assert ast_tree.lines[0] == ast.Line([
+    assert _ast.lines[0] == ast.Line([
         ast.Step('s'),
         ast.FuncCall('f'),
         ast.Step('s')
@@ -132,11 +132,11 @@ def test_func_call_args_moves():
 
 def test_func_def():
 
-    ast_tree = parse("""
+    _ast = parse("""
     f:ss
     """)
 
-    assert ast_tree.lines[0] == ast.Line([
+    assert _ast.lines[0] == ast.Line([
         ast.FuncDefinition('f', None, ast.Line([ast.Step('s'), ast.Step('s')]))
     ])
 
