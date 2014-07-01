@@ -7,41 +7,32 @@ import lexer
 pg = ParserGenerator(lexer.TOKENS, cache_id="language")
 
 
-@pg.production("main : line")
-def main_line(p):
+@pg.production("program : line")
+def program(p):
     return ast.Root(p[0])
 
 
-@pg.production("main : main line")
-def main_main_line(p):
+@pg.production("program : NEWLINE line")
+def NEWLINE_program_line(p):
+    return ast.Root(p[1])
+
+
+@pg.production("program : program line")
+def program_program_line(p):
     p[0].append(p[1])
     return p[0]
 
 
-@pg.production("line : line-content")
+@pg.production("line : line-content NEWLINE")
 def line(p):
     return p[0]
-
-
-@pg.production("line : line-content NEWLINE")
-def line_content_NEWLINE(p):
-    return p[0]
-
-
-@pg.production("line : NEWLINE line-content NEWLINE")
-def NEWLINE_line_NEWLINE(p):
-    return p[1]
-
-
-@pg.production("line : NEWLINE line-content")
-def NEWLINE_line_content(p):
-    return p[1]
 
 
 @pg.production("line-content : func-definition ")
 @pg.production("line-content : moves-list ")
 def line_content(p):
     return p[0]
+
 
 
 @pg.production("func-definition : FUNC COLON moves-list ")
@@ -69,17 +60,20 @@ def func_definition(p):
 #     return ast.DefinitionArg(p[0].getstr(), p[0].getsourcepos())
 
 
-@pg.production("moves-list : moves-list variable ")
 @pg.production("moves-list : moves-list move ")
-@pg.production("moves-list : moves-list func-call ")
 def moves_list(p):
     p[0].append(p[1])
     return p[0]
 
 
+@pg.production("moves-list : move ")
+def moves_list_move(p):
+    return ast.Line([p[0]])
+
+
 @pg.production("move : variable ")
-@pg.production("move : step ")
 @pg.production("move : func-call ")
+@pg.production("move : step ")
 def move(p):
     return p[0]
 
@@ -89,9 +83,9 @@ def variable(p):
     return ast.Variable(p[0].getstr(), p[0].getsourcepos())
 
 
-@pg.production("moves-list : move ")
-def moves_list_move(p):
-    return ast.Line([p[0]])
+@pg.production("func-call : FUNC ")
+def func_call(p):
+    return ast.FuncCall(p[0].getstr(), None, p[0].getsourcepos())
 
 
 @pg.production("step : STEP ")
@@ -99,11 +93,6 @@ def moves_list_move(p):
 @pg.production("step : TURN_RIGHT ")
 def step(p):
     return ast.Step(p[0].getstr(), p[0].getsourcepos())
-
-
-@pg.production("func-call : FUNC ")
-def func_call(p):
-    return ast.FuncCall(p[0].getstr(), None, p[0].getsourcepos())
 
 
 @pg.production("func-call : FUNC ( args-list ) ")
@@ -141,7 +130,7 @@ parser = pg.build()
 
 
 def parse(code):
+    code = "%s\n" % code
     token_stream = lexer.lexer.lex(code)
     ast_tree = parser.parse(token_stream)
-
     return ast_tree
