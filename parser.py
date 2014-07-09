@@ -1,38 +1,36 @@
 from rply import ParserGenerator
 
-
 import ast
 import lexer
 
+
 pg = ParserGenerator(lexer.TOKENS, cache_id="language")
 
-
-@pg.production("program : line")
-def program(p):
+@pg.production("main : line")
+def main(p):
     return ast.Root(p[0])
 
 
-@pg.production("program : NEWLINE line")
-def NEWLINE_program_line(p):
+@pg.production("main : NEWLINE line")
+def NEWLINE_main(p):
     return ast.Root(p[1])
 
 
-@pg.production("program : program line")
-def program_program_line(p):
+@pg.production("main : main line")
+def main_line(p):
     p[0].append(p[1])
     return p[0]
 
 
-@pg.production("line : line-content NEWLINE")
+@pg.production("line : line-content NEWLINE ")
 def line(p):
     return p[0]
 
 
-@pg.production("line-content : func-definition ")
 @pg.production("line-content : moves-list ")
+@pg.production("line-content : func-definition ")
 def line_content(p):
     return p[0]
-
 
 
 @pg.production("func-definition : FUNC COLON moves-list ")
@@ -45,19 +43,14 @@ def func_definition(p):
     )])
 
 
-# @pg.production("func-definition : FUNC ( definition-args ) COLON moves-list ")
-# def func_definition_args(p):
-#     return ast.Line(ast.FuncDefinition(
-#         p[0].getstr(),
-#         p[2],
-#         p[5],
-#         p[0].getsourcepos()
-#     ))
-
-
-# @pg.production("definition-args : NAME ")
-# def definition_args(p):
-#     return ast.DefinitionArg(p[0].getstr(), p[0].getsourcepos())
+@pg.production("func-definition : FUNC ( NAME ) COLON moves-list ")
+def func_definition_args(p):
+    return ast.Line([ast.FuncDefinition(
+        p[0].getstr(),
+        None,
+        p[5],
+        p[0].getsourcepos()
+    )])
 
 
 @pg.production("moves-list : moves-list move ")
@@ -130,7 +123,8 @@ parser = pg.build()
 
 
 def parse(code):
-    code = "%s\n" % code
+    # code = "%s" % code
+    print [t for t in lexer.lexer.lex(code)]
     token_stream = lexer.lexer.lex(code)
-    ast_tree = parser.parse(token_stream)
-    return ast_tree
+    return parser.parse(token_stream)
+
