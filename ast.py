@@ -19,7 +19,7 @@ class Node(BaseBox):
 class Root(Node):
 
     def __init__(self, lines):
-        self.lines = [lines]
+        self.lines = lines
 
     def append(self, element):
         self.lines.append(element)

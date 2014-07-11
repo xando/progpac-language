@@ -4,16 +4,26 @@ import ast
 import lexer
 
 
-pg = ParserGenerator(lexer.TOKENS, cache_id="language")
+pg = ParserGenerator(
+    lexer.TOKENS,
+    precedence=[("nonassoc", ['NEWLINE', ')'])],
+    cache_id="language"
+)
+
 
 @pg.production("main : line")
 def main(p):
-    return ast.Root(p[0])
+    return ast.Root([p[0]])
+
+
+@pg.production("main : NEWLINE")
+def main_empty(p):
+    return ast.Root([])
 
 
 @pg.production("main : NEWLINE line")
 def NEWLINE_main(p):
-    return ast.Root(p[1])
+    return ast.Root([p[1]])
 
 
 @pg.production("main : main line")
@@ -123,8 +133,7 @@ parser = pg.build()
 
 
 def parse(code):
-    # code = "%s" % code
+    code = "%s\n" % code
     print [t for t in lexer.lexer.lex(code)]
     token_stream = lexer.lexer.lex(code)
     return parser.parse(token_stream)
-
