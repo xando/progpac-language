@@ -16,6 +16,7 @@ lg.add(")", r"\)")
 lg.add(",", r"\,")
 
 lg.ignore(r" +")
+lg.ignore(r"\#.*")
 
 TOKENS = [r.name for r in lg.rules]
 
