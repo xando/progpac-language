@@ -11,8 +11,15 @@ def entry_point(argv):
         code = f.read()
         f.close()
 
-        ast_tree = parser.parse(code)
-        print ast.compile(ast_tree)
+        try:
+            ast_tree = parser.parse(code)
+            print ast_tree
+            code = ast.compile(ast_tree)
+            print code
+        except ValueError as e:
+            print e.message
+
+        sys.exit()
 
     return 1
 

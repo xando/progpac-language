@@ -6,7 +6,7 @@ import lexer
 
 pg = ParserGenerator(
     lexer.TOKENS,
-    precedence=[("nonassoc", ['NEWLINE', ')'])],
+    precedence=[("nonassoc", ['NEWLINE', ')', 'COLON'])],
     cache_id="language"
 )
 
@@ -44,23 +44,39 @@ def line_content(p):
 
 
 @pg.production("func-definition : FUNC COLON moves-list ")
-def func_definition(p):
+def func_def(p):
     return ast.Line([ast.FuncDefinition(
         p[0].getstr(),
+        p[2],
         None,
+        p[0].getsourcepos()
+    )])
+
+
+@pg.production("func-definition : FUNC ( def-args-list ) COLON moves-list ")
+def func_def_args(p):
+    return ast.Line([ast.FuncDefinition(
+        p[0].getstr(),
+        p[5],
         p[2],
         p[0].getsourcepos()
     )])
 
 
-@pg.production("func-definition : FUNC ( NAME ) COLON moves-list ")
-def func_definition_args(p):
-    return ast.Line([ast.FuncDefinition(
-        p[0].getstr(),
-        None,
-        p[5],
-        p[0].getsourcepos()
-    )])
+@pg.production("def-args-list : def-args-list , def-arg ")
+def func_def_args_list_def_args_list_def_arg(p):
+    p[0].append(p[2])
+    return p[0]
+
+
+@pg.production("def-args-list : def-arg ")
+def func_def_args_list_def_arg(p):
+    return ast.DefArgList([p[0]])
+
+
+@pg.production("def-arg : NAME ")
+def func_def_args_list(p):
+    return ast.DefArg(p[0].getstr(), p[0].getsourcepos())
 
 
 @pg.production("moves-list : moves-list move ")
@@ -99,7 +115,7 @@ def step(p):
 
 
 @pg.production("func-call : FUNC ( args-list ) ")
-def func_call_ags(p):
+def func_call_args(p):
     return ast.FuncCall(p[0].getstr(), p[2], p[0].getsourcepos())
 
 
@@ -126,7 +142,12 @@ def call_args_moves_list(p):
 
 @pg.error
 def error_handler(token):
-    raise ValueError("Ran into a %s where it wasn't expected" % token.gettokentype())
+    line = token.source_pos.lineno
+    column = token.source_pos.colno
+
+    raise ValueError('(%s:%s) Ran into a "%s" where it wasn\'t expected.' % (
+        line, column, token.gettokentype())
+    )
 
 
 parser = pg.build()

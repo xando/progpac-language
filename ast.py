@@ -66,13 +66,16 @@ class Step(Node):
         return "Step('%s')" % self.value
 
     def compile(self, ctx):
-        ctx.code.append(self.value)
+        ctx.stack[-1].code.append(self)
 
 
 class FuncCall(Node):
     def __init__(self, value, args=None, pos=None):
         self.value = value
-        self.args = args
+        if args:
+            self.args = args.stmts
+        else:
+            self.args = []
         self.pos = pos
 
     def getstr(self):
@@ -82,20 +85,47 @@ class FuncCall(Node):
         return "FuncCall('%s', %s)" % (self.value, self.args)
 
     def compile(self, ctx):
-        function_body = ctx.functions[self.value]
-        ctx.stack.append(self.args)
+        try:
+            function_body, def_args = ctx.functions[self.value]
+        except KeyError:
+            raise ValueError('(%s:%s) Function "%s" is undefined.' % (
+                self.pos.lineno, self.pos.colno, self.value)
+            )
+
+        def_args_number = len(def_args)
+        call_args_number = len(self.args)
+
+        if def_args_number != call_args_number:
+            raise ValueError('(%s:%s) Function "%s" takes %s arguments, %s given.' % (
+                self.pos.lineno, self.pos.colno, self.value, def_args_number, call_args_number)
+            )
+
+
+        call_variables = {}
+
+        for i, arg in enumerate(self.args):
+            ctx.stack.append(Frame(ctx.stack[-1].variables))
+            arg.compile(ctx)
+            frame = ctx.stack.pop()
+            call_variables[def_args[i].name] = Line(frame.code)
+
+        ctx.stack.append(Frame(call_variables))
+
         for step in function_body.get_stmts():
-            try:
-                step.compile(ctx)
-            except RuntimeError:
-                pass
+            step.compile(ctx)
+
+        frame = ctx.stack.pop()
+        ctx.stack[-1].code.extend(frame.code)
 
 
 class FuncDefinition(Node):
-    def __init__(self, name, args, body, pos=None):
+    def __init__(self, name, body, args=None, pos=None):
         self.name = name
         self.body = body
-        self.args = args
+        if args:
+            self.args = args.stmts
+        else:
+            self.args = []
         self.pos = pos
 
     def getstr(self):
@@ -105,12 +135,13 @@ class FuncDefinition(Node):
         return "FuncDefinition('%s', %s, %s)" % (self.name, self.args, self.body)
 
     def compile(self, ctx):
-        ctx.functions[self.name] = self.body
+        ctx.functions[self.name] = self.body, self.args
 
 
 class Variable(Node):
     def __init__(self, name, pos=None):
         self.name = name
+        self.pos = pos
 
     def getstr(self):
         return self.name
@@ -119,15 +150,15 @@ class Variable(Node):
         return "Variable('%s')" % self.name
 
     def compile(self, ctx):
-        if not ctx.stack:
-            raise Exception("Using arguments outside functions is not allowed")
+        try:
+            ctx.stack[-1].variables[self.name].compile(ctx)
+        except KeyError:
+            raise ValueError('(%s:%s) Variable "%s" is undefined.' % (
+                self.pos.lineno, self.pos.colno, self.name)
+            )
 
-        args = ctx.stack.pop()
-        for step in args.stmts:
-            step.compile(ctx)
 
-
-class DefinitionArg(Node):
+class DefArg(Node):
     def __init__(self, name, pos=None):
         self.name = name
         self.pos = pos
@@ -139,7 +170,13 @@ class DefinitionArg(Node):
         return "Arg(%s)" % self.name
 
 
-class CallArg(Node):
+class DefArgList(Line):
+
+    def __repr__(self):
+        return "DefArgList(stmts=%s)" % self.stmts
+
+
+class CallArg(Line):
     def __init__(self, value, pos=None):
         self.value = value
         self.pos = pos
@@ -148,7 +185,7 @@ class CallArg(Node):
         return self.value
 
     def __repr__(self):
-        return "Arg(%s)" % self.value
+        return "CallArg(%s)" % self.value
 
 
 class CallArgList(Line):
@@ -157,14 +194,21 @@ class CallArgList(Line):
         return "CallArgList(stmts=%s)" % self.stmts
 
 
+class Frame(object):
+
+    def __init__(self, variables=None):
+        self.code = []
+        self.variables = variables or {}
+
+    def __repr__(self):
+        return "<Frame %s: %s>" % (self.variables, self.code)
 
 class Context(object):
-    code = []
     functions = {}
-    stack = []
+    stack = [Frame()]
 
 
 def compile(ast):
     ctx = Context()
     ast.compile(ctx)
-    return "".join(ctx.code)
+    return "".join([c.value for c in ctx.stack[-1].code])
