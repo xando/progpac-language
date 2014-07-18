@@ -15,6 +15,9 @@ class Node(BaseBox):
 
         return self.__dict__ == other.__dict__
 
+    def error(self, message):
+        raise ValueError(message)
+
 
 class Root(Node):
 
@@ -88,7 +91,7 @@ class FuncCall(Node):
         try:
             function_body, def_args = ctx.functions[self.value]
         except KeyError:
-            raise ValueError('(%s:%s) Function "%s" is undefined.' % (
+            self.error('(%s:%s) Function "%s" is undefined.' % (
                 self.pos.lineno, self.pos.colno, self.value)
             )
 
@@ -96,10 +99,9 @@ class FuncCall(Node):
         call_args_number = len(self.args)
 
         if def_args_number != call_args_number:
-            raise ValueError('(%s:%s) Function "%s" takes %s arguments, %s given.' % (
+            self.error('(%s:%s) Function "%s" takes %s arguments, %s given.' % (
                 self.pos.lineno, self.pos.colno, self.value, def_args_number, call_args_number)
             )
-
 
         call_variables = {}
 
@@ -153,7 +155,7 @@ class Variable(Node):
         try:
             ctx.stack[-1].variables[self.name].compile(ctx)
         except KeyError:
-            raise ValueError('(%s:%s) Variable "%s" is undefined.' % (
+            self.error('(%s:%s) Variable "%s" is undefined.' % (
                 self.pos.lineno, self.pos.colno, self.name)
             )
 
