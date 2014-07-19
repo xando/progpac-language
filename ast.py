@@ -1,5 +1,9 @@
 from rply.token import BaseBox
 
+class color:
+   RED = '\033[91m'
+   END = '\033[0m'
+
 
 class Node(BaseBox):
     def compile(self, ctx):
@@ -15,8 +19,20 @@ class Node(BaseBox):
 
         return self.__dict__ == other.__dict__
 
-    def error(self, message):
-        raise ValueError(message)
+    def error(self, message, ctx):
+        line = ctx.source.split("\n")[self.pos.lineno - 1]
+        code = []
+        for i, c in enumerate(line):
+            if i == self.pos.colno - 1:
+                code.append(color.RED + c + color.END)
+            else:
+                code.append(c)
+
+        print "".join(code)
+        print color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
+        raise ValueError(
+            message
+        )
 
 
 class Root(Node):
@@ -92,7 +108,7 @@ class FuncCall(Node):
             function_body, def_args = ctx.functions[self.value]
         except KeyError:
             self.error('(%s:%s) Function "%s" is undefined.' % (
-                self.pos.lineno, self.pos.colno, self.value)
+                self.pos.lineno, self.pos.colno, self.value), ctx
             )
 
         def_args_number = len(def_args)
@@ -100,7 +116,7 @@ class FuncCall(Node):
 
         if def_args_number != call_args_number:
             self.error('(%s:%s) Function "%s" takes %s arguments, %s given.' % (
-                self.pos.lineno, self.pos.colno, self.value, def_args_number, call_args_number)
+                self.pos.lineno, self.pos.colno, self.value, def_args_number, call_args_number), ctx
             )
 
         call_variables = {}
@@ -156,7 +172,7 @@ class Variable(Node):
             ctx.stack[-1].variables[self.name].compile(ctx)
         except KeyError:
             self.error('(%s:%s) Variable "%s" is undefined.' % (
-                self.pos.lineno, self.pos.colno, self.name)
+                self.pos.lineno, self.pos.colno, self.name), ctx
             )
 
 
@@ -205,12 +221,16 @@ class Frame(object):
     def __repr__(self):
         return "<Frame %s: %s>" % (self.variables, self.code)
 
+
 class Context(object):
-    functions = {}
-    stack = [Frame()]
+
+    def __init__(self, source):
+        self.source = source
+        self.functions = {}
+        self.stack = [Frame()]
 
 
-def compile(ast):
-    ctx = Context()
+def compile(ast, source):
+    ctx = Context(source)
     ast.compile(ctx)
     return "".join([c.value for c in ctx.stack[-1].code])
