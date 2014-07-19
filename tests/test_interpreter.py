@@ -36,6 +36,16 @@ def test_funcion():
     """) == "srrr"
 
 
+def test_recursion_error():
+    ret = interpret("""
+    f:f
+    f
+    """)
+
+    assert 'Line:2, Column:7' in ret
+    assert 'Stack limit reached' in ret
+    print ret
+
 def test_function_variable():
     assert interpret("""
     f(A):A
