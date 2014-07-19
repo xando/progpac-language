@@ -36,6 +36,29 @@ def test_funcion():
     """) == "srrr"
 
 
+def test_function_variable():
+    assert interpret("""
+    f(A):A
+    f(ss)
+    """) == "ss"
+
+    assert interpret("""
+    f(A,B):AB
+    f(ss, rr)
+    """) == "ssrr"
+
+    assert interpret("""
+    f(A):llA
+    ssf(rr)
+    """) == "ssllrr"
+
+    assert interpret("""
+    z(A):A
+    f(A):lz(A)l
+    ssf(rr)
+    """) == "sslrrl"
+
+
 def test_error_funcion_undefined():
     ret = interpret("z")
 
