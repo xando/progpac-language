@@ -8,13 +8,13 @@ def entry_point(argv):
     if len(argv) > 1:
         filename = argv[1]
         f = open(filename, 'r')
-        code = f.read()
+        source = f.read()
         f.close()
 
         try:
-            ast_tree = parser.parse(code)
-            print ast_tree
-            code = ast.compile(ast_tree)
+            ast_tree = parser.parse(source)
+            # print ast_tree
+            code = ast.compile(ast_tree, source)
             print code
         except ValueError as e:
             print e.message
