@@ -129,7 +129,6 @@ def test_func_call_args_moves():
     ])
 
 
-
 def test_func_def():
 
     _ast = parse("""
