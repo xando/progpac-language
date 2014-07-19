@@ -137,6 +137,6 @@ def test_func_def():
     """)
 
     assert _ast.lines[0] == ast.Line([
-        ast.FuncDefinition('f', None, ast.Line([ast.Step('s'), ast.Step('s')]))
+        ast.FuncDefinition('f', ast.Line([ast.Step('s'), ast.Step('s')]), None)
     ])
 
