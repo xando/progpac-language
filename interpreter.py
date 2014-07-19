@@ -1,7 +1,7 @@
 import sys
 
-import parser
-import ast
+from language import parser
+from language import ast
 
 
 def entry_point(argv):
@@ -13,7 +13,6 @@ def entry_point(argv):
 
         try:
             ast_tree = parser.parse(source)
-            # print ast_tree
             code = ast.compile(ast_tree, source)
             print code
         except ValueError as e:
@@ -25,7 +24,7 @@ def entry_point(argv):
 
 
 def target(driver, args):
-    driver.exe_name = 'language'
+    driver.exe_name = 'progpac-interpreter'
     return entry_point, None
 
 
