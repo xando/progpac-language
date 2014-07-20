@@ -1,0 +1,32 @@
+#level .editor textarea {
+	height: 300px;
+	font-family: monospace;
+}
+
+#level .editor .form-group {
+	margin-bottom: 0px;
+	/* height: 300px; */
+	/* font-family: monospace; */
+}
+
+#level .render {
+	background: black;
+	height: 298px;
+	border-radius: 4px;
+	margin-top: 1px;
+}
+
+#level .errors {
+	background: red;
+	height: 70px;
+	border-radius: 4px;
+	margin-top: 1px;
+}
+
+#level .btn-group {
+	background: red;
+	height: 70px;
+	border-radius: 4px;
+	margin-top: 1px;
+}
+
