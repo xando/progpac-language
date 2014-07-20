@@ -1,118 +1,123 @@
-from language import parser
-from language import ast
-
-
-def interpret(source):
-    try:
-        ast_tree = parser.parse(source)
-        return ast.compile(ast_tree, source)
-    except ValueError as e:
-        return e.message
+from language import interpreter
 
 
 
 def test_steps():
-    assert interpret("sss") == "sss"
-    assert interpret("rsss") == "rsss"
-    assert interpret("sssl") == "sssl"
+    assert interpreter.interpret("sss")['code'] == "sss"
+    assert interpreter.interpret("rsss")['code'] == "rsss"
+    assert interpreter.interpret("sssl")['code'] == "sssl"
 
 
 def test_funcion():
-    assert interpret("""
+    ret = interpreter.interpret("""
     f:sss
     f
-    """) == "sss"
+    """)
 
-    assert interpret("""
+    assert ret["code"] == "sss"
+
+    ret = interpreter.interpret("""
     z:rrr
     f:sss
     fz
-    """) == "sssrrr"
+    """)
 
-    assert interpret("""
+    assert ret["code"] == "sssrrr"
+
+    ret = interpreter.interpret("""
     z:rrr
     f:sz
     f
-    """) == "srrr"
+    """)
+
+    assert ret["code"] == "srrr"
+
+
+def test_function_variable():
+    ret = interpreter.interpret("""
+    f(A):A
+    f(ss)
+    """)
+
+    assert ret["code"] == "ss"
+
+    ret = interpreter.interpret("""
+    f(A,B):AB
+    f(ss, rr)
+    """)
+
+    assert ret["code"] == "ssrr"
+
+    ret = interpreter.interpret("""
+    f(A):llA
+    ssf(rr)
+    """)
+
+    assert ret["code"] == "ssllrr"
+
+    ret = interpreter.interpret("""
+    z(A):A
+    f(A):lz(A)l
+    ssf(rr)
+    """)
+
+    assert ret["code"] == "sslrrl"
 
 
 def test_recursion_error():
-    ret = interpret("""
+    ret = interpreter.interpret("""
     f:f
     f
     """)
 
-    assert 'Line:2, Column:7' in ret
-    assert 'Stack limit reached' in ret
-    print ret
-
-def test_function_variable():
-    assert interpret("""
-    f(A):A
-    f(ss)
-    """) == "ss"
-
-    assert interpret("""
-    f(A,B):AB
-    f(ss, rr)
-    """) == "ssrr"
-
-    assert interpret("""
-    f(A):llA
-    ssf(rr)
-    """) == "ssllrr"
-
-    assert interpret("""
-    z(A):A
-    f(A):lz(A)l
-    ssf(rr)
-    """) == "sslrrl"
+    assert ret['error']['location'] == 'Line:2, Column:7'
+    assert ret['error']['message'] == 'Stack limit reached.'
 
 
 def test_error_funcion_undefined():
-    ret = interpret("z")
+    ret = interpreter.interpret("z")
 
-    assert 'Line:1, Column:1' in ret
-    assert 'Function "z" is undefined.' in ret
+    assert ret['error']['location'] == 'Line:1, Column:1'
+    assert ret['error']['message'] == 'Function "z" is undefined.'
 
-    ret = interpret("""
+    ret = interpreter.interpret("""
     ssszf
     """)
 
-    assert 'Line:2, Column:8' in ret
-    assert 'Function "z" is undefined.' in ret
+    assert ret['error']['location'] == 'Line:2, Column:8'
+    assert ret['error']['message'] == 'Function "z" is undefined.'
 
 
 def test_error_funcion_arguments():
-    ret = interpret("""
+    ret = interpreter.interpret("""
     f(A):sA
     f
     """)
 
-    assert 'Line:3, Column:5' in ret
-    assert 'Function "f" takes 1 arguments, 0 given' in ret
+    assert ret['error']['location'] == 'Line:3, Column:5'
+    assert ret['error']['message'] == 'Function "f" takes 1 arguments, 0 given.'
 
-    ret = interpret("""
+    ret = interpreter.interpret("""
     f(A,B):sAB
     f(ss)
     """)
 
-    assert 'Line:3, Column:5' in ret
-    assert 'Function "f" takes 2 arguments, 1 given' in ret
+    assert ret['error']['location'] == 'Line:3, Column:5'
+    assert ret['error']['message'] == 'Function "f" takes 2 arguments, 1 given.'
 
 
 def test_error_variable():
-    ret = interpret("""
+    ret = interpreter.interpret("""
     B
     """)
 
-    assert 'Line:2, Column:5' in ret
-    assert 'Variable "B" is undefined' in ret
+    assert ret['error']['location'] == 'Line:2, Column:5'
+    assert ret['error']['message'] == 'Variable "B" is undefined.'
 
-    ret = interpret("""
+    ret = interpreter.interpret("""
     f:B
     sssf
     """)
 
-    assert 'Line:2, Column:7' in ret
-    assert 'Variable "B" is undefined' in ret
+    assert ret['error']['location'] == 'Line:2, Column:7'
+    assert ret['error']['message'] == 'Variable "B" is undefined.'

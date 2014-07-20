@@ -1,7 +1,6 @@
 import sys
 
-from language import parser
-from language import ast
+from language import interpreter
 
 
 def entry_point(argv):
@@ -11,14 +10,16 @@ def entry_point(argv):
         source = f.read()
         f.close()
 
-        try:
-            ast_tree = parser.parse(source)
-            code = ast.compile(ast_tree, source)
-            print code
-        except ValueError as e:
-            print e.message
+        ret = interpreter.interpret(source)
+        if not ret['error']:
+            print ret['code']
+        else:
+            print ret['error']['location']
+            print ret['error']['message']
+            print ret['error']['help']
 
         sys.exit()
+
 
     return 1
 

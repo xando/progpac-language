@@ -29,13 +29,22 @@ class Node(BaseBox):
             else:
                 code.append(c)
 
-        error = [
-           "Line:%s, Column:%s" % (self.pos.lineno, self.pos.colno),
-           message,
-           "".join(code),
-           color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
-        ]
-        raise ValueError("\n".join(error))
+        error = {
+           "location": "Line:%s, Column:%s" % (self.pos.lineno, self.pos.colno),
+           "message": message,
+           "help": "%s\n%s" % (
+              "".join(code),
+              color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
+           )
+        }
+        # error = [
+
+        #    message,
+        #    "".join(code),
+        #    color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
+        # ]
+
+        raise ValueError(error)
 
 
 class Root(Node):
