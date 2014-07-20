@@ -12,7 +12,7 @@ var app = angular.module(
 				templateUrl: '/templates/index.html',
 				controller: 'index'
 			})
-			.when('/level/:id', {
+			.when('/:hash', {
 				templateUrl: '/templates/level.html',
 				controller: 'level'
 			});
@@ -26,13 +26,19 @@ app.controller('index', ['$scope', '$http',
   }]);
 
 
-app.controller('level', ['$scope', '$http',
-  function ($scope, $http) {
+app.controller('level', ['$scope', '$http', '$routeParams',
+  function ($scope, $http, $routeParams) {
+
+	  var url = '/level/' + $routeParams.hash;
+
+	  $http.get(url).success(function(level) {
+		  $scope.level = level;
+	  });
 
 	  $scope.submit = function() {
 		  var data = {source: $scope.source};
 
-		  $http.post('/validate/', data).success(function(response) {
+		  $http.post(url + '/validate/', data).success(function(response) {
 			  $scope.error = response.error;
 		  });
 	  }

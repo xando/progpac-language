@@ -7,8 +7,9 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = (
-    # 'django.contrib.staticfiles',
+    'rest_framework',
     'web',
+
 )
 
 MIDDLEWARE_CLASSES = (
