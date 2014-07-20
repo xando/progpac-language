@@ -25,42 +25,17 @@ app.controller('index', ['$scope', '$http',
 
   }]);
 
+
 app.controller('level', ['$scope', '$http',
   function ($scope, $http) {
 
 	  $scope.submit = function() {
-		  var data = {code: $scope.code};
+		  var data = {source: $scope.source};
 
 		  $http.post('/validate/', data).success(function(response) {
-			  debugger
+			  $scope.error = response.error;
 		  });
-
 	  }
+
   }]);
 
-
-// function index($scope, $routeParams, $location) {
-// }
-
-// .factory('Person', ['$resource', function($resource) {
-// 	return $resource('/person/:id', {id:'@id'}, {
-// 		'update': {method:'PUT'}
-// 	});
-// }]);
-
-
-	// $scope.people = Person.query();
-	// $scope.test = "Seba";
-
-	// $scope.submit = function() {
-
-	// 	Person.save({
-	// 		first_name: $scope.firstname,
-	// 		last_name: $scope.lastname,
-	// 	}, function() {
-	// 		// success
-	// 	}, function(response) {
-	// 		$scope.error = response.data;
-	// 	})
-
-	// };
