@@ -8,7 +8,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = (
     # 'django.contrib.staticfiles',
-    'progpac',
+    'web',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -16,8 +16,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'progpac.urls'
-WSGI_APPLICATION = 'progpac.wsgi.application'
+ROOT_URLCONF = 'web.urls'
+WSGI_APPLICATION = 'web.wsgi.application'
 
 DATABASES = {
     'default': {
