@@ -5,12 +5,10 @@
 
 #level .editor .form-group {
 	margin-bottom: 0px;
-	/* height: 300px; */
-	/* font-family: monospace; */
 }
 
 #level .render {
-	background: black;
+	background: green;
 	height: 298px;
 	border-radius: 4px;
 	margin-top: 1px;
