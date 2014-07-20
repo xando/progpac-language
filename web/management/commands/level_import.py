@@ -18,6 +18,7 @@ class Command(BaseCommand):
         maxsize = source_lines[-1]
         points = source_lines[-3]
 
+        print hash
         print Level.objects.get_or_create(
             hash=hash,
             name=name,
