@@ -37,12 +37,6 @@ class Node(BaseBox):
               color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
            )
         }
-        # error = [
-
-        #    message,
-        #    "".join(code),
-        #    color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
-        # ]
 
         raise ValueError(error)
 

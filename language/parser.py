@@ -157,31 +157,31 @@ class color:
    RED = '\033[91m'
    END = '\033[0m'
 
-def parse(code):
-    code = "%s\n" % code
+def parse(source):
+    source = "%s\n" % source
+
     try:
-        token_stream = lexer.lexer.lex(code)
+        token_stream = lexer.lexer.lex(source)
         return parser.parse(token_stream)
-    except LexingError as e:
-        raise e
-        # sys.exit(1)
-        # idx = e.source_pos.idx
-        # head_code = []
-        # while code[idx] != "\n":
-        #     idx = idx + 1
-        #     head_code.append(code[idx])
-        # head = "".join(head_code[:-1])
+    except LexingError:
+        colno = token_stream.idx -source.rfind("\n", 0, token_stream.idx)
+        lineno = token_stream._lineno
 
-        # tail_code = []
-        # idx = e.source_pos.idx
-        # while code[idx] != "\n":
-        #     idx = idx - 1
-        #     tail_code.append(code[idx])
-        # tail = "".join(list(reversed(tail_code))[1:])
+        line = source.split("\n")[lineno - 1]
+        code = []
+        for i, c in enumerate(line):
+            if i == colno - 1:
+                code.append(color.RED + c + color.END)
+            else:
+                code.append(c)
 
-        # print "".join(code)
-        # # print color.RED + "-" * (self.pos.colno - 1) + '^' + color.END
+        error = {
+            "location": "Line:%s, Column:%s" % (lineno, colno),
+            "message": "Lexer error",
+            "help": "%s\n%s" % (
+                "".join(code),
+                color.RED + "-" * (colno - 1) + '^' + color.END
+            )
+        }
 
-        # print
-        # import pdb; pdb.set_trace()
-
+        raise ValueError(error)
