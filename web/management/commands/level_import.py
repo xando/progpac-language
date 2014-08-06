@@ -2,31 +2,24 @@ import os
 import hashlib
 
 from django.core.management.base import BaseCommand, CommandError
+
 from web.models import Level
 
 
 class Command(BaseCommand):
     help = 'Load levels from file'
 
-    def level_import(self, location):
-        source = open(location, 'r').read()
-        source_lines = source.split()
+    def level_import(self, level_file):
+        source = open(level_file, 'r').read()
 
-        name = location.rstrip(".txt")
-        hash = hashlib.sha1(source).hexdigest()
-        contet = "\n".join(source_lines[:25])
-        maxsize = source_lines[-1]
-        points = source_lines[-3]
+        level_hash = hashlib.sha1(source).hexdigest()
+        level_name = level_file.split('/')[-1].rstrip('.txt')
 
-        print hash
-        print Level.objects.get_or_create(
-            hash=hash,
-            name=name,
-            content=contet,
-            maxsize=maxsize,
-            points=points,
+        print Level.objects.update_or_create(
+            hash=level_hash,
+            name=level_name,
+            file=level_file
         )
-
 
     def handle(self, *args, **options):
         for path in args:

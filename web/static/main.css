@@ -1,6 +1,13 @@
+#level {
+	max-width: 900px;
+	margin-top: 50px;
+}
+
 #level .editor textarea {
 	height: 300px;
 	font-family: monospace;
+	font-size: 20px;
+	font-weight: bold;
 }
 
 #level .editor .form-group {
@@ -9,7 +16,6 @@
 
 #level .render {
 	background: green;
-	height: 298px;
 	border-radius: 4px;
 	margin-top: 1px;
 }

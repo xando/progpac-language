@@ -7,41 +7,88 @@ var face_list = [
 	ASSETS + 'guy_left.png'
 ]
 
-var start_level = function(data, element) {
+TILE = {
+	GRASS: '.',
+	WALL: 'o',
+	STAR: '*',
+}
 
-	var game = new Phaser.Game(element.width(), element.height(), Phaser.AUTO, 'render', {
-		preload: preload,
-		create: create,
-		update: update
+var grass = PIXI.Texture.fromImage('assets/Grass Block.png');
+var wall = PIXI.Texture.fromImage('assets/Wall Block.png');
+var star = PIXI.Texture.fromImage('assets/Star.png');
+
+function __draw_map(stage, scale, data) {
+
+	var x = 0;
+	var y = -50 * scale;
+	var tail_x = 100 * scale;
+	var tail_y = 80 * scale;
+
+	$.each(data.content, function(_, line) {
+		for (i=0; i < line.length; i++) {
+			var element = line[i];
+			if (element === TILE.WALL) {
+				var tile = new PIXI.Sprite(wall);
+			} else {
+				var tile = new PIXI.Sprite(grass);
+			}
+			tile.position.x = x;
+			tile.position.y = y;
+			tile.scale.x = scale;
+			tile.scale.y = scale;
+			stage.addChild(tile);
+
+			x += tail_x;
+		}
+		y += tail_y;
+		x = 0;
+	});
+}
+
+function __draw_stars(stage, scale, data) {
+
+	var x = 0;
+	var y = -80 * scale;
+	var tail_x = 100 * scale;
+	var tail_y = 80 * scale;
+
+	$.each(data.content, function(_, line) {
+		for (i=0; i < line.length; i++) {
+			var element = line[i];
+			if (element === TILE.STAR) {
+				var tile = new PIXI.Sprite(star);
+				tile.position.x = x;
+				tile.position.y = y;
+				tile.scale.x = scale;
+				tile.scale.y = scale;
+				stage.addChild(tile);
+			}
+			x += tail_x;
+		}
+		y += tail_y;
+		x = 0;
 	});
 
-	function preload() {
-		game.load.image('grass', 'assets/Grass Block.png');
-		game.load.image('wall', 'assets/Wall Block.png');
-	}
+}
 
-	function create() {
-		element.width();
-		element.height()
 
-		var x = 0;
-		var y = 0;
-		var tile_x = 100;
-		var scale_x = element.width() / data.content.split('\n')[0].length;
 
-		$.each(data.content.split('\n'), function(_, line) {
-			for (i = 0; i < line.length; i++) {
-				var tile = game.add.sprite(x, y, 'grass');
-				tile.scale.x = scale_x;
-				// x += scale_x * tile_x;
-			}
-			y += 80;
-			x = 0;
-		})
-	}
+var GAME = function(data, element, editor) {
+	var scale = element.width() / data.content.length / 100;
 
-	function update() {
+	var stage = new PIXI.Stage;
+	var renderer = new PIXI.WebGLRenderer(element.width(), element.height());
 
-	}
+	element.html(renderer.view)
+
+	__draw_map(stage, scale, data);
+	__draw_stars(stage, scale, data);
+
+	requestAnimationFrame(animate);
+
+    function animate() {
+		renderer.render(stage);
+        requestAnimationFrame(animate);
+    }
 };
 

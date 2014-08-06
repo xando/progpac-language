@@ -33,7 +33,7 @@ app.controller('level', ['$scope', '$http', '$routeParams',
 
 	  $http.get(url).success(function(level) {
 		  $scope.level = level;
-		  start_level(level, angular.element('.render'));
+		  GAME(level, angular.element('.render'), angular.element('textarea'));
 	  });
 
 	  $scope.submit = function() {

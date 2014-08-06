@@ -9,7 +9,6 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = (
     'rest_framework',
     'web',
-
 )
 
 MIDDLEWARE_CLASSES = (
@@ -35,3 +34,9 @@ USE_TZ = True
 
 STATIC_URL = '/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
