@@ -109,14 +109,12 @@ Game.prototype.drawStars = function() {
 					.to({y:y-20}, 1500, createjs.Ease.linear)
 					.to({y:y}, 1500, createjs.Ease.linear);
 
-				var shadow = new createjs.Shape();
-				shadow.graphics.beginFill("black").drawEllipse(x, y, 20, 10);
-				shadow.regX = 10;
-				shadow.regy = 5;
-				// shadow.alpha = 0.4
-
-				this.stage.addChild(shadow);
-
+				// var shadow = new createjs.Shape();
+				// shadow.graphics.beginFill("black").drawEllipse(x, y, 20, 10);
+				// shadow.regX = 10;
+				// shadow.regy = 5;
+				// // shadow.alpha = 0.4
+				// this.stage.addChild(shadow);
 				stars.push(tile);
 				// debugger
 				// createjs.Tween.get(shadow, {loop:true})
@@ -173,7 +171,7 @@ Game.prototype.walk = function(path) {
 				y -= tile_y;
 				tween.to({y: y}, 300, createjs.Ease.linear)
 			} else if (direction == 1) {
-				x -= tile_x;
+				x += tile_x;
 				tween.to({x: x}, 300, createjs.Ease.linear)
 			} else if (direction == 2) {
 				y += tile_y;
@@ -192,6 +190,23 @@ Game.prototype.walk = function(path) {
 					}
 				}
 			});
+		}
+		if (element == 'x') {
+			var shift_x = 0;
+			var shift_y = 0;
+
+			if (direction == 0) {
+				tween.to({y: y - TILE_HEIGHT / 4}, 100, createjs.Ease.linear)
+			} else if (direction == 1) {
+				tween.to({x: x + TILE_WIDTH / 4}, 100, createjs.Ease.linear)
+			} else if (direction == 2) {
+				tween.to({y: y + TILE_HEIGHT / 4}, 100, createjs.Ease.linear)
+			} else if (direction == 3) {
+				tween.to({x: x - TILE_WIDTH / 4}, 100, createjs.Ease.linear)
+			}
+
+			tween.to({x: x, y: y}, 100, createjs.Ease.linear)
+
 		}
 	}
 }
