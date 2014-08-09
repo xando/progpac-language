@@ -33,16 +33,20 @@ app.controller('level', ['$scope', '$http', '$routeParams',
 
 	  $http.get(url).success(function(level) {
 		  $scope.level = level;
-		  GAME(level, angular.element('.render'), angular.element('textarea'));
+		  var game = new Game(angular.element('.render'), level.content);
+
+		  $scope.submit = function() {
+			  game.reset();
+			  var data = {source: $scope.source};
+
+			  $http.post(url + '/validate/', data).success(function(response) {
+				  game.walk(response[0]);
+				  // $scope.error = response.error;
+			  });
+		  }
+
 	  });
 
-	  $scope.submit = function() {
-		  var data = {source: $scope.source};
-
-		  $http.post(url + '/validate/', data).success(function(response) {
-			  $scope.error = response.error;
-		  });
-	  }
 
   }]);
 
