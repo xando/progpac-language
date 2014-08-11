@@ -174,22 +174,22 @@ Game.prototype.walk = function(path) {
 		if (["r", "l"].indexOf(element) !== -1) {
 			element = path_elements.shift();
 			direction = parseInt(element)
-			tween.wait(100);
+			tween.wait(50);
 			tween.set({src: SPRITES['guy'+direction]}, this.guy.image);
 		}
 		if (element == 's') {
 			if (direction == 0) {
 				y -= TILE_HEIGHT;
-				tween.to({y: y}, 300, createjs.Ease.linear)
+				tween.to({y: y}, 200, createjs.Ease.linear)
 			} else if (direction == 1) {
 				x += TILE_WIDTH;
-				tween.to({x: x}, 300, createjs.Ease.linear)
+				tween.to({x: x}, 200, createjs.Ease.linear)
 			} else if (direction == 2) {
 				y += TILE_HEIGHT;
-				tween.to({y: y}, 300, createjs.Ease.linear)
+				tween.to({y: y}, 200, createjs.Ease.linear)
 			} else if (direction == 3) {
 				x -= TILE_WIDTH;
-				tween.to({x: x}, 300, createjs.Ease.linear)
+				tween.to({x: x}, 200, createjs.Ease.linear)
 			}
 			tween.call(function() {
 				// Naive hit test
@@ -197,7 +197,7 @@ Game.prototype.walk = function(path) {
 					var star = self.stars[i];
 					if ((Math.abs(star.x - self.guy.x) < TILE_HEIGHT / 2) &&
 						(Math.abs(star.y - self.guy.y) < TILE_WIDTH / 2)) {
-						self.stage.removeChild(star)
+						self.layer2.removeChild(star)
 					}
 				}
 			});
