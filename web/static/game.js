@@ -7,12 +7,11 @@ TILE = {
 }
 
 SPRITES = {
-	guy: {
-		'0': 'assets/guy_back.png',
-		'1': 'assets/guy_right.png',
-		'2': 'assets/guy_front.png',
-		'3': 'assets/guy_left.png',
-	},
+	guy0: 'assets/guy_back.png',
+	guy1: 'assets/guy_right.png',
+	guy2: 'assets/guy_front.png',
+	guy3: 'assets/guy_left.png',
+
 	grass: 'assets/Grass Block.png',
 	wall: 'assets/Stone Block.png',
 	star: 'assets/Star.png',
@@ -33,7 +32,14 @@ var LAYER_2_Y_SHIFT = -25;
 var Game = function(element, world) {
 	this.world = world;
 
+	this.queue = new createjs.LoadQueue();
+
+	for (var key in SPRITES) {
+		this.queue.loadFile({id:key, src:SPRITES[key]});
+	}
+
 	var scale = WIDTH / world.length / TILE_WIDTH;
+
 	this.stage = new createjs.Stage("render");
 	this.stage.scaleX = scale;
 	this.stage.scaleY = scale;
@@ -43,15 +49,20 @@ var Game = function(element, world) {
 
 	this.layer2 = new createjs.Container();
 	this.layer2.y = LAYER_2_Y_SHIFT;
-
 	this.stage.addChild(this.layer2);
 
-	this.drawMap();
-	this.guy = this.drawGuy();
-	this.stars = this.drawStars();
+	this.queue.on("complete", function() {
 
-	createjs.Ticker.setFPS(80);
-	createjs.Ticker.addEventListener("tick", this.stage);
+		this.drawMap();
+		this.guy = this.drawGuy();
+		this.stars = this.drawStars();
+
+		createjs.Ticker.setFPS(80);
+		createjs.Ticker.addEventListener("tick", this.stage);
+
+		$('#level').show();
+
+	}, this);
 };
 
 Game.prototype.drawTile = function(type, x, y, layer) {
@@ -94,7 +105,9 @@ Game.prototype.drawGuy = function() {
 		for (j=0; j < this.world[i].length; j++) {
 
 			if (["0", "1", "2", "3"].indexOf(this.world[i][j]) !== -1) {
-				var guy = this.drawTile(SPRITES.guy[this.world[i][j]], x, y, this.layer2);
+				var guy = this.drawTile(
+					SPRITES['guy' + this.world[i][j]], x, y, this.layer2
+				);
 				guy.direction = parseInt(this.world[i][j])
 				return guy;
 			}
@@ -157,11 +170,12 @@ Game.prototype.walk = function(path) {
 	var y = this.guy.y;
 
 	while (element = path_elements.shift()) {
-		if (["0", "1", "2", "3"].indexOf(element) !== -1) {
-			direction = parseInt(element)
+		// debugger
+		if (["r", "l"].indexOf(element) !== -1) {
 			element = path_elements.shift();
+			direction = parseInt(element)
 			tween.wait(100);
-			tween.set({src: SPRITES.guy[direction]}, this.guy.image);
+			tween.set({src: SPRITES['guy'+direction]}, this.guy.image);
 		}
 		if (element == 's') {
 			if (direction == 0) {

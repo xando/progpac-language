@@ -36,13 +36,13 @@ app.controller('level', ['$scope', '$http', '$routeParams',
 		  var game = new Game(angular.element('.render'), level.content);
 
 		  $scope.submit = function() {
-			  game.reset();
 			  var data = {source: $scope.source};
 
 			  $http.post(url + '/validate/', data).success(function(response) {
 				  if (Object.keys(response.interpreted.error).length > 0) {
 					  $scope.error = response.interpreted.error;
 				  } else {
+					  game.reset();
 					  $scope.error = null;
 					  game.walk(response.walk[0]);
 				  }

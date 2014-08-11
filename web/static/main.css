@@ -5,9 +5,11 @@ body {
 #level {
 	max-width: 900px;
 	margin-top: 30px;
+	display: none;
 }
 
 #level .editor textarea {
+	resize: none;
 	height: 477px;
 	font-family: monospace;
 	font-size: 20px;
