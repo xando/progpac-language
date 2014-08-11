@@ -8,7 +8,6 @@ body {
 }
 
 #level .editor textarea {
-	padding-left: 10px;
 	height: 477px;
 	font-family: monospace;
 	font-size: 20px;
