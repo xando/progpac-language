@@ -12,14 +12,14 @@ SPRITES = {
 		'1': 'assets/guy_right.png',
 		'2': 'assets/guy_front.png',
 		'3': 'assets/guy_left.png',
-	}
+	},
+	grass: 'assets/Grass Block.png',
+	wall: 'assets/Stone Block.png',
+	star: 'assets/Star.png',
+	tree: 'assets/Tree Short.png',
+	rock: 'assets/Rock.png',
 }
 
-var grass = 'assets/Grass Block.png';
-var wall = 'assets/Stone Block.png';
-var star = 'assets/Star.png';
-var tree = 'assets/Tree Short.png';
-var rock = 'assets/Rock.png';
 
 var HEIGHT = 600;
 var WIDTH = 600;
@@ -69,15 +69,15 @@ Game.prototype.drawMap = function() {
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.WALL) {
-				this.drawTile(grass, x, y, this.layer1);
+				this.drawTile(SPRITES.grass, x, y, this.layer1);
 			} else if (this.world[i][j] === TILE.ROCK) {
-				this.drawTile(grass, x, y, this.layer1);
-				this.drawTile(rock, x, y, this.layer2);
+				this.drawTile(SPRITES.grass, x, y, this.layer1);
+				this.drawTile(SPRITES.rock, x, y, this.layer2);
 			} else if (this.world[i][j] === TILE.TREE) {
-				this.drawTile(grass, x, y, this.layer1);
-				this.drawTile(tree, x, y, this.layer2);
+				this.drawTile(SPRITES.grass, x, y, this.layer1);
+				this.drawTile(SPRITES.tree, x, y, this.layer2);
 			} else {
-				this.drawTile(grass, x, y, this.layer1);
+				this.drawTile(SPRITES.grass, x, y, this.layer1);
 			}
 			x += TILE_WIDTH;
 		}
@@ -115,12 +115,12 @@ Game.prototype.drawStars = function() {
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.STAR) {
-				stars.push(this.drawTile(star, x, y, this.layer2));
+				var star = this.drawTile(SPRITES.star, x, y, this.layer2);
+				stars.push(star);
 
-				// ToDo: bouncing
-				// createjs.Tween.get(star, {loop:true})
-				// 	.to({y:y-20}, 1500, createjs.Ease.linear)
-				// 	.to({y:y}, 1500, createjs.Ease.linear);
+				createjs.Tween.get(star, {loop:true})
+					.to({y:y-20}, 1500, createjs.Ease.linear)
+					.to({y:y}, 1500, createjs.Ease.linear);
 
 				// ToDo: shadows
 
