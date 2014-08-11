@@ -40,8 +40,12 @@ app.controller('level', ['$scope', '$http', '$routeParams',
 			  var data = {source: $scope.source};
 
 			  $http.post(url + '/validate/', data).success(function(response) {
-				  game.walk(response[0]);
-				  // $scope.error = response.error;
+				  if (Object.keys(response.interpreted.error).length > 0) {
+					  $scope.error = response.interpreted.error;
+				  } else {
+					  $scope.error = null;
+					  game.walk(response.walk[0]);
+				  }
 			  });
 		  }
 

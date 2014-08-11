@@ -2,21 +2,25 @@
 
   <div class="row">
     <div class="col-md-8">
-      <canvas id="render" class="render" width="600", height="580"></canvas>
-      <div class="errors">
-	{{ error.location }} <br/>
-	{{ error.message }}
-      </div>
+      <canvas id="render" class="render" width="600", height="556"></canvas>
       
     </div>
     
     <div class="col-md-4 editor">
       <form role="form" ng-submit="submit()">
 	<div class="form-group">
-	  <textarea ng-model="source" class="form-control"></textarea>
+	  <textarea ng-model="source" class="form-control" ng-class="{witherrors: error}">
+	  </textarea>
 	</div>
 
-	<div class="btn-group">
+	<div class="error" ng-show="error">
+	  {{ error.length }}
+	  {{ error.length == 0  }}
+	  {{ error.location }} <br/>
+	  {{ error.message }}
+	</div>
+
+	<div class="btn-group btn-block"> 
 	  <button type="button" class="btn btn-default btn-warning btn-lg">
 	    <span class="glyphicon glyphicon-remove"></span>
 	  </button>

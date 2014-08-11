@@ -1,131 +1,133 @@
 TILE = {
 	GRASS: '.',
-	WALL: 'o',
+	WALL: '#',
 	STAR: '*',
+	TREE: '^',
+	ROCK: '@',
+}
+
+SPRITES = {
+	guy: {
+		'0': 'assets/guy_back.png',
+		'1': 'assets/guy_right.png',
+		'2': 'assets/guy_front.png',
+		'3': 'assets/guy_left.png',
+	}
 }
 
 var grass = 'assets/Grass Block.png';
-var wall = 'assets/Wall Block.png';
+var wall = 'assets/Stone Block.png';
 var star = 'assets/Star.png';
+var tree = 'assets/Tree Short.png';
+var rock = 'assets/Rock.png';
 
-var guy = {
-	'0': 'assets/guy_back.png',
-	'1': 'assets/guy_right.png',
-	'2': 'assets/guy_front.png',
-	'3': 'assets/guy_left.png',
-}
-
-var HEIGHT = 580;
+var HEIGHT = 600;
 var WIDTH = 600;
 var TILE_HEIGHT = 83;
 var TILE_WIDTH = 100;
 
-var LAYER_1_Y_SHIFT = -50;
-var LAYER_2_Y_SHIFT = -70;
+var LAYER_1_Y_SHIFT = -5;
+var LAYER_2_Y_SHIFT = -25;
 
 
 var Game = function(element, world) {
-	this.stage = new createjs.Stage("render");
-	this.scaleX = WIDTH / world.length / TILE_WIDTH;
-	this.scaleY = HEIGHT / world.length / TILE_HEIGHT;
-
 	this.world = world;
 
-	this.drawWorld();
-	this.stars = this.drawStars();
-	this.guy = this.drawGuy();
+	var scale = WIDTH / world.length / TILE_WIDTH;
+	this.stage = new createjs.Stage("render");
+	this.stage.scaleX = scale;
+	this.stage.scaleY = scale;
 
-	createjs.Ticker.setFPS(20);
+	this.layer1 = new createjs.Container();
+	this.stage.addChild(this.layer1);
+
+	this.layer2 = new createjs.Container();
+	this.layer2.y = LAYER_2_Y_SHIFT;
+
+	this.stage.addChild(this.layer2);
+
+	this.drawMap();
+	this.guy = this.drawGuy();
+	this.stars = this.drawStars();
+
+	createjs.Ticker.setFPS(80);
 	createjs.Ticker.addEventListener("tick", this.stage);
 };
 
-Game.prototype.drawWorld = function() {
+Game.prototype.drawTile = function(type, x, y, layer) {
+	var tile = new createjs.Bitmap(type);
+	tile.x = x;
+	tile.y = y;
+	layer.addChild(tile);
+	return tile;
+}
+
+Game.prototype.drawMap = function() {
 	var x = 0;
-	var y = LAYER_1_Y_SHIFT * this.scaleY;
-	var tile_x = TILE_WIDTH * this.scaleX;
-	var tile_y = TILE_HEIGHT * this.scaleY;
+	var y = 0;
 
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.WALL) {
-				var tile = new createjs.Bitmap(wall);
+				this.drawTile(grass, x, y, this.layer1);
+			} else if (this.world[i][j] === TILE.ROCK) {
+				this.drawTile(grass, x, y, this.layer1);
+				this.drawTile(rock, x, y, this.layer2);
+			} else if (this.world[i][j] === TILE.TREE) {
+				this.drawTile(grass, x, y, this.layer1);
+				this.drawTile(tree, x, y, this.layer2);
 			} else {
-				var tile = new createjs.Bitmap(grass);
+				this.drawTile(grass, x, y, this.layer1);
 			}
-			tile.x = x;
-			tile.y = y;
-			tile.scaleX = this.scaleX;
-			tile.scaleY = this.scaleY;
-			this.stage.addChild(tile);
-
-			x += tile_x;
+			x += TILE_WIDTH;
 		}
-		y += tile_y;
+		y += TILE_HEIGHT;
 		x = 0;
 	}
-};
+
+}
 
 Game.prototype.drawGuy = function() {
-	var tile_x = TILE_WIDTH * this.scaleX;
-	var tile_y = TILE_HEIGHT * this.scaleY;
-
+	var x = 0;
+	var y = 0;
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
+
 			if (["0", "1", "2", "3"].indexOf(this.world[i][j]) !== -1) {
-				var tile = new createjs.Bitmap(guy[this.world[i][j]]);
-				tile.x = tile_x * j;
-				tile.y = LAYER_2_Y_SHIFT + tile_y * i;
-				tile.scaleX = this.scaleX;
-				// TODO: wrong scaling
-				tile.scaleY = this.scaleX;
-				tile.direction = this.world[i][j];
-				this.stage.addChild(tile);
-				return tile;
+				var guy = this.drawTile(SPRITES.guy[this.world[i][j]], x, y, this.layer2);
+				guy.direction = parseInt(this.world[i][j])
+				return guy;
 			}
+
+			x += TILE_WIDTH;
 		}
+		y += TILE_HEIGHT;
+		x = 0;
 	}
 };
 
 Game.prototype.drawStars = function() {
 	var x = 0;
-	var y = LAYER_2_Y_SHIFT * this.scaleY;
-	var tile_x = TILE_WIDTH * this.scaleX;
-	var tile_y = TILE_HEIGHT * this.scaleY;
+	var y = 0;
 
 	var stars = [];
 
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.STAR) {
-				var tile = new createjs.Bitmap(star);
-				tile.x = x;
-				tile.y = y;
-				tile.scaleX = this.scaleX;
-				// TODO: wrong scaling
-				tile.scaleY = this.scaleX;
-				this.stage.addChild(tile);
+				stars.push(this.drawTile(star, x, y, this.layer2));
 
-				createjs.Tween.get(tile, {loop:true})
-					.to({y:y-20}, 1500, createjs.Ease.linear)
-					.to({y:y}, 1500, createjs.Ease.linear);
+				// ToDo: bouncing
+				// createjs.Tween.get(star, {loop:true})
+				// 	.to({y:y-20}, 1500, createjs.Ease.linear)
+				// 	.to({y:y}, 1500, createjs.Ease.linear);
 
-				// var shadow = new createjs.Shape();
-				// shadow.graphics.beginFill("black").drawEllipse(x, y, 20, 10);
-				// shadow.regX = 10;
-				// shadow.regy = 5;
-				// // shadow.alpha = 0.4
-				// this.stage.addChild(shadow);
-				stars.push(tile);
-				// debugger
-				// createjs.Tween.get(shadow, {loop:true})
-				// .to({alpha:0.2}, 1500, createjs.Ease.linear);
-					// .to({scaleX:1.1, alpha:0.4}, 1500, createjs.Ease.linear)
-					// .to({h:15}, 1500, createjs.Ease.linear);
+				// ToDo: shadows
 
 			}
-			x += tile_x;
+			x += TILE_WIDTH;
 		}
-		y += tile_y;
+		y += TILE_HEIGHT;
 		x = 0;
 	}
 
@@ -135,9 +137,9 @@ Game.prototype.drawStars = function() {
 
 Game.prototype.reset = function() {
 	for (i=0; i<this.stars.length; i++) {
-		this.stage.removeChild(this.stars[i]);
+		this.layer2.removeChild(this.stars[i]);
 	}
-	this.stage.removeChild(this.guy);
+	this.layer2.removeChild(this.guy);
 
 	this.stars = this.drawStars();
 	this.guy = this.drawGuy();
@@ -147,37 +149,32 @@ Game.prototype.reset = function() {
 Game.prototype.walk = function(path) {
 	self = this;
 
-	var tile_x = TILE_WIDTH * this.scaleX;
-	var tile_y = TILE_HEIGHT * this.scaleY;
-
+	var path_elements = path.split('');
 	var tween = createjs.Tween.get(this.guy);
 
 	var direction = this.guy.direction;
 	var x = this.guy.x;
 	var y = this.guy.y;
 
-	var path_elements = path.split('');
-
 	while (element = path_elements.shift()) {
-
 		if (["0", "1", "2", "3"].indexOf(element) !== -1) {
 			direction = parseInt(element)
 			element = path_elements.shift();
-			tween.wait(200);
-			tween.set({src: guy[direction]}, this.guy.image);
+			tween.wait(100);
+			tween.set({src: SPRITES.guy[direction]}, this.guy.image);
 		}
 		if (element == 's') {
 			if (direction == 0) {
-				y -= tile_y;
+				y -= TILE_HEIGHT;
 				tween.to({y: y}, 300, createjs.Ease.linear)
 			} else if (direction == 1) {
-				x += tile_x;
+				x += TILE_WIDTH;
 				tween.to({x: x}, 300, createjs.Ease.linear)
 			} else if (direction == 2) {
-				y += tile_y;
+				y += TILE_HEIGHT;
 				tween.to({y: y}, 300, createjs.Ease.linear)
 			} else if (direction == 3) {
-				x -= tile_x;
+				x -= TILE_WIDTH;
 				tween.to({x: x}, 300, createjs.Ease.linear)
 			}
 			tween.call(function() {
@@ -192,6 +189,7 @@ Game.prototype.walk = function(path) {
 			});
 		}
 		if (element == 'x') {
+
 			var shift_x = 0;
 			var shift_y = 0;
 

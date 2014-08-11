@@ -32,6 +32,10 @@ class Validate(APIView):
     def post(self, request, pk, format=None):
         level = models.Level.objects.get(hash=pk)
         world = open(level.file, 'r').read().strip()
-        res = interpreter.interpret(request.DATA.get('source', ''))
-        interpreter.walk_world(world, res['code'])
-        return Response(interpreter.walk_world(world, res['code']))
+        interpreted = interpreter.interpret(request.DATA.get('source', ''))
+        walk = interpreter.walk_world(world, interpreted['code'])
+        return Response({
+            'interpreted': interpreted,
+            'walk': walk
+        })
+
