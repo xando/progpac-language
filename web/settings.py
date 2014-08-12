@@ -2,9 +2,9 @@ import os
 BASE_DIR = os.path.dirname(__file__)
 SECRET_KEY = 'w=9isj!4!m=)8eqfhrnb8!c34-y3#1qt*i!-!f1dyinh&mt@z-'
 
-DEBUG = True
-TEMPLATE_DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+ALLOWED_HOSTS = ['http://xando.webfactional.com/']
 
 INSTALLED_APPS = (
     'rest_framework',
