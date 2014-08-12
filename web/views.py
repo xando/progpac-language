@@ -1,3 +1,5 @@
+import os
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, serializers
@@ -13,8 +15,8 @@ class LevelSerializer(serializers.ModelSerializer):
         model = models.Level
 
     def get_content(self, obj):
-        content = open(obj.file, 'r').read().strip().split()
-        # assert len(content) == len(content[0])
+        file_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', obj.file))
+        content = open(file_path, 'r').read().strip().split()
         return content
 
 
