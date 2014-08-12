@@ -1,0 +1,3 @@
+https://github.com/django/django/archive/stable/1.7.x.zip
+https://github.com/xando/herbert/archive/master.zip
+djangorestframework==2.3.14
