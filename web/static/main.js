@@ -33,7 +33,7 @@ app.controller('index', ['$scope', '$http', '$location',
 	  });
 
 	  $scope.go = function(level) {
-		  $location.path(level.hash);
+		  $location.path(level.key);
 	  }
 
   }]);
@@ -42,7 +42,7 @@ app.controller('index', ['$scope', '$http', '$location',
 app.controller('level', ['$scope', '$http', '$routeParams',
   function ($scope, $http, $routeParams) {
 
-	  var url = '/level/' + $routeParams.hash;
+	  var url = '/level/' + $routeParams.hash + '/';
 
 	  $http.get(url).success(function(level) {
 		  $scope.level = level;
@@ -51,7 +51,7 @@ app.controller('level', ['$scope', '$http', '$routeParams',
 		  $scope.submit = function() {
 			  var data = {source: $scope.source};
 
-			  $http.post(url + '/validate/', data).success(function(response) {
+			  $http.post(url, data).success(function(response) {
 				  if (Object.keys(response.interpreted.error).length > 0) {
 					  $scope.error = response.interpreted.error;
 				  } else {

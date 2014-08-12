@@ -1,44 +1,35 @@
-import os
+import json
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import generics, serializers
+from django.http import JsonResponse, HttpResponseNotFound
+from django.views.generic import View
 
 from herbert import interpreter
-from . import models
 
+from . import levels
 
-class LevelSerializer(serializers.ModelSerializer):
-    content = serializers.SerializerMethodField('get_content')
+class Level(View):
 
-    class Meta:
-        model = models.Level
+    def get(self, request, key):
+        level = levels.level_get(key)
+        if not level:
+            return HttpResponseNotFound()
+        return JsonResponse(level)
 
-    def get_content(self, obj):
-        file_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', obj.file))
-        content = open(file_path, 'r').read().strip().split()
-        return content
+    def post(self, request, key):
+        level = levels.level_get(key)
+        if not level:
+            return HttpResponseNotFound()
 
-
-class LevelView(generics.RetrieveAPIView):
-    serializer_class = LevelSerializer
-    model = models.Level
-
-
-class LevelListView(generics.ListAPIView):
-    serializer_class = LevelSerializer
-    model = models.Level
-
-
-class Validate(APIView):
-    def post(self, request, pk, format=None):
-        obj = models.Level.objects.get(hash=pk)
-        file_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', obj.file))
-        world = open(file_path, 'r').read().strip()
-        interpreted = interpreter.interpret(request.DATA.get('source', ''))
-        walk = interpreter.walk_world(world, interpreted['code'])
-        return Response({
+        data = json.loads(request.body)
+        interpreted = interpreter.interpret(data.get('source', ''))
+        walk = interpreter.walk_world(level['content'], interpreted['code'])
+        return JsonResponse({
             'interpreted': interpreted,
             'walk': walk
         })
 
+
+
+class LevelsList(View):
+    def get(self, request):
+        return JsonResponse(levels.level_list(), safe=False)

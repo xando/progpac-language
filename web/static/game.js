@@ -17,7 +17,6 @@ TILES = {
 	star: '/static/assets/Star.png',
 	tree: '/static/assets/Tree Short.png',
 	rock: '/static/assets/Rock.png',
-
 }
 
 SOUNDS = {
@@ -85,7 +84,6 @@ Game.prototype.drawTile = function(type, x, y, layer) {
 Game.prototype.drawMap = function() {
 	var x = 0;
 	var y = 0;
-
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.WALL) {
