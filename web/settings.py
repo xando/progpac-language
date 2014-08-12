@@ -1,10 +1,10 @@
 import os
+
 BASE_DIR = os.path.dirname(__file__)
 SECRET_KEY = 'w=9isj!4!m=)8eqfhrnb8!c34-y3#1qt*i!-!f1dyinh&mt@z-'
 
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
-ALLOWED_HOSTS = ['http://xando.webfactional.com/']
+DEBUG = True
+ALLOWED_HOSTS = ['xando.webfactional.com']
 
 INSTALLED_APPS = (
     'rest_framework',
@@ -40,3 +40,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+if 'webfaction.com' in os.environ.get('HOSTNAME', ''):
+    ALLOWED_HOSTS = ['xando.webfactional.com']
+    DEBUG = True
+
