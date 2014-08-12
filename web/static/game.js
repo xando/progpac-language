@@ -6,7 +6,7 @@ TILE = {
 	ROCK: '@',
 }
 
-SPRITES = {
+TILES = {
 	guy0: 'assets/guy_back.png',
 	guy1: 'assets/guy_right.png',
 	guy2: 'assets/guy_front.png',
@@ -17,8 +17,13 @@ SPRITES = {
 	star: 'assets/Star.png',
 	tree: 'assets/Tree Short.png',
 	rock: 'assets/Rock.png',
+
 }
 
+SOUNDS = {
+	star : 'assets/music/star_pickup.wav',
+	wrong : 'assets/music/wrong_move.wav'
+}
 
 var HEIGHT = 600;
 var WIDTH = 600;
@@ -31,12 +36,6 @@ var LAYER_2_Y_SHIFT = -25;
 
 var Game = function(element, world) {
 	this.world = world;
-
-	this.queue = new createjs.LoadQueue();
-
-	for (var key in SPRITES) {
-		this.queue.loadFile({id:key, src:SPRITES[key]});
-	}
 
 	var scale = WIDTH / world.length / TILE_WIDTH;
 
@@ -51,7 +50,17 @@ var Game = function(element, world) {
 	this.layer2.y = LAYER_2_Y_SHIFT;
 	this.stage.addChild(this.layer2);
 
-	this.queue.on("complete", function() {
+	this.resources = new createjs.LoadQueue();
+
+	for (var key in TILES) {
+		this.resources.loadFile({id:key, src:TILES[key]});
+	}
+
+	for (var key in SOUNDS) {
+		createjs.Sound.registerSound(SOUNDS[key], key);
+	}
+
+	this.resources.on("complete", function() {
 
 		this.drawMap();
 		this.guy = this.drawGuy();
@@ -66,7 +75,7 @@ var Game = function(element, world) {
 };
 
 Game.prototype.drawTile = function(type, x, y, layer) {
-	var tile = new createjs.Bitmap(type);
+	var tile = new createjs.Bitmap(this.resources.getItem(type).src);
 	tile.x = x;
 	tile.y = y;
 	layer.addChild(tile);
@@ -80,15 +89,15 @@ Game.prototype.drawMap = function() {
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.WALL) {
-				this.drawTile(SPRITES.grass, x, y, this.layer1);
+				this.drawTile('grass', x, y, this.layer1);
 			} else if (this.world[i][j] === TILE.ROCK) {
-				this.drawTile(SPRITES.grass, x, y, this.layer1);
-				this.drawTile(SPRITES.rock, x, y, this.layer2);
+				this.drawTile('grass', x, y, this.layer1);
+				this.drawTile('rock', x, y, this.layer2);
 			} else if (this.world[i][j] === TILE.TREE) {
-				this.drawTile(SPRITES.grass, x, y, this.layer1);
-				this.drawTile(SPRITES.tree, x, y, this.layer2);
+				this.drawTile('grass', x, y, this.layer1);
+				this.drawTile('tree', x, y, this.layer2);
 			} else {
-				this.drawTile(SPRITES.grass, x, y, this.layer1);
+				this.drawTile('grass', x, y, this.layer1);
 			}
 			x += TILE_WIDTH;
 		}
@@ -105,9 +114,7 @@ Game.prototype.drawGuy = function() {
 		for (j=0; j < this.world[i].length; j++) {
 
 			if (["0", "1", "2", "3"].indexOf(this.world[i][j]) !== -1) {
-				var guy = this.drawTile(
-					SPRITES['guy' + this.world[i][j]], x, y, this.layer2
-				);
+				var guy = this.drawTile('guy' + this.world[i][j], x, y, this.layer2);
 				guy.direction = parseInt(this.world[i][j])
 				return guy;
 			}
@@ -128,7 +135,7 @@ Game.prototype.drawStars = function() {
 	for(i=0; i < this.world.length; i++) {
 		for (j=0; j < this.world[i].length; j++) {
 			if (this.world[i][j] === TILE.STAR) {
-				var star = this.drawTile(SPRITES.star, x, y, this.layer2);
+				var star = this.drawTile('star', x, y, this.layer2);
 				stars.push(star);
 
 				createjs.Tween.get(star, {loop:true})
@@ -170,12 +177,12 @@ Game.prototype.walk = function(path) {
 	var y = this.guy.y;
 
 	while (element = path_elements.shift()) {
-		// debugger
 		if (["r", "l"].indexOf(element) !== -1) {
 			element = path_elements.shift();
 			direction = parseInt(element)
-			tween.wait(50);
-			tween.set({src: SPRITES['guy'+direction]}, this.guy.image);
+			tween
+				.wait(50)
+				.set({src: this.resources.getResult('guy'+direction).src}, this.guy.image);
 		}
 		if (element == 's') {
 			if (direction == 0) {
@@ -198,6 +205,8 @@ Game.prototype.walk = function(path) {
 					if ((Math.abs(star.x - self.guy.x) < TILE_HEIGHT / 2) &&
 						(Math.abs(star.y - self.guy.y) < TILE_WIDTH / 2)) {
 						self.layer2.removeChild(star)
+
+						createjs.Sound.play('star')
 					}
 				}
 			});
@@ -216,7 +225,9 @@ Game.prototype.walk = function(path) {
 			} else if (direction == 3) {
 				tween.to({x: x - TILE_WIDTH / 4}, 100, createjs.Ease.linear)
 			}
-
+			tween.call(function () {
+				createjs.Sound.play('wrong')
+			})
 			tween.to({x: x, y: y}, 100, createjs.Ease.linear)
 
 		}
