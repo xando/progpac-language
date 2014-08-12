@@ -7,22 +7,22 @@ TILE = {
 }
 
 TILES = {
-	guy0: 'assets/guy_back.png',
-	guy1: 'assets/guy_right.png',
-	guy2: 'assets/guy_front.png',
-	guy3: 'assets/guy_left.png',
+	guy0: '/static/assets/guy_back.png',
+	guy1: '/static/assets/guy_right.png',
+	guy2: '/static/assets/guy_front.png',
+	guy3: '/static/assets/guy_left.png',
 
-	grass: 'assets/Grass Block.png',
-	wall: 'assets/Stone Block.png',
-	star: 'assets/Star.png',
-	tree: 'assets/Tree Short.png',
-	rock: 'assets/Rock.png',
+	grass: '/static/assets/Grass Block.png',
+	wall: '/static/assets/Stone Block.png',
+	star: '/static/assets/Star.png',
+	tree: '/static/assets/Tree Short.png',
+	rock: '/static/assets/Rock.png',
 
 }
 
 SOUNDS = {
-	star : 'assets/music/star_pickup.wav',
-	wrong : 'assets/music/wrong_move.wav'
+	star : '/static/assets/music/star_pickup.wav',
+	wrong : '/static/assets/music/wrong_move.wav'
 }
 
 var HEIGHT = 600;

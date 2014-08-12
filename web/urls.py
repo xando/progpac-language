@@ -10,5 +10,5 @@ urlpatterns = [
     url(r'^level/(?P<pk>[0-9a-z]{40})/validate/$', views.Validate.as_view()),
 
     url(r'^$', static.serve, {'path':'templates/base.html', 'document_root': settings.STATIC_ROOT}),
-    url(r'^(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_ROOT}),
+    url(r'^static/(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_ROOT}),
 ]

@@ -9,11 +9,11 @@ var app = angular.module(
 
 		$routeProvider
 			.when('/', {
-				templateUrl: '/templates/index.html',
+				templateUrl: '/static/templates/index.html',
 				controller: 'index'
 			})
 			.when('/:hash', {
-				templateUrl: '/templates/level.html',
+				templateUrl: '/static/templates/level.html',
 				controller: 'level'
 			});
 
