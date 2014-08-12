@@ -20,8 +20,21 @@ var app = angular.module(
 	});
 
 
-app.controller('index', ['$scope', '$http',
-  function ($scope, $http) {
+app.controller('index', ['$scope', '$http', '$location',
+  function ($scope, $http, $location) {
+	  var url = '/level/';
+
+	  $http.get(url).success(function(levels) {
+		  $scope.levels_rows = [];
+		  var i,j,temparray,chunk = 3;
+		  for (i=0,j=levels.length; i<j; i+=chunk) {
+			  $scope.levels_rows.push(levels.slice(i,i+chunk))
+		  }
+	  });
+
+	  $scope.go = function(level) {
+		  $location.path(level.hash);
+	  }
 
   }]);
 

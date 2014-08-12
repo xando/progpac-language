@@ -2,6 +2,44 @@ body {
 	background: black
 }
 
+#main {
+	padding-top: 50px;
+	font-family: monospace;
+}
+
+#main .level {
+	cursor: pointer;
+	background: #ccc;
+	margin: 10px;
+	padding: 10px 10px 15px 10px;
+	text-align: center;
+}
+
+#main .level .results {
+	font-size: 40px;
+}
+
+#main .level .stars :before {
+	position: absolute;
+	font-size: 25px;
+}
+
+#main .level .stars .first:before {
+	top: -33px;
+	left: -32px;
+}
+
+#main .level .stars .middle:before {
+	top: -19px;
+	left: -13px;
+	font-size: 30px;
+}
+
+#main .level .stars .last:before {
+	top: -33px;
+	left: 11px;
+}
+
 #level {
 	max-width: 900px;
 	margin-top: 30px;

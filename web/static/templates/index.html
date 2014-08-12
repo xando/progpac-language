@@ -1,18 +1,19 @@
-<div class="container">
+<div id="main" class="container">
 
-  <div class="jumbotron">
-    <h1>Navbar example</h1>
-    <p>
-      This  example is  a  quick exercise  to  illustrate how  the
-      default,  static navbar  and fixed  to top  navbar work.  It
-      includes the responsive  CSS and HTML, so it  also adapts to
-      your viewport and device.
-    </p>
-    <p>
-      <a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">
-	View navbar docs &raquo;
-      </a>
-    </p>
+  <div class="row" ng-repeat="levels in levels_rows">
+    <div class="col-md-4" ng-repeat="level in levels">
+      <div class="level" ng-click="go(level)">
+	{{ level.name }}
+	<div class="results">
+	  0
+	</div>
+	<div class="stars">
+	  <span class="glyphicon glyphicon-star first"></span>
+	  <span class="glyphicon glyphicon-star middle"></span>
+	  <span class="glyphicon glyphicon-star last"></span>
+	</div>
+      </div>
+    </div>
   </div>
 
 </div>
