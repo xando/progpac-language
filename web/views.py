@@ -32,8 +32,9 @@ class LevelListView(generics.ListAPIView):
 
 class Validate(APIView):
     def post(self, request, pk, format=None):
-        level = models.Level.objects.get(hash=pk)
-        world = open(level.file, 'r').read().strip()
+        obj = models.Level.objects.get(hash=pk)
+        file_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', obj.file))
+        world = open(file_path, 'r').read().strip()
         interpreted = interpreter.interpret(request.DATA.get('source', ''))
         walk = interpreter.walk_world(world, interpreted['code'])
         return Response({
