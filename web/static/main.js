@@ -39,14 +39,14 @@ app.controller('index', ['$scope', '$http', '$location',
   }]);
 
 
-app.controller('level', ['$scope', '$http', '$routeParams',
-  function ($scope, $http, $routeParams) {
-
+app.controller('level', ['$scope', '$http', '$routeParams', '$location',
+  function ($scope, $http, $routeParams, $location) {
 	  var url = '/level/' + $routeParams.hash + '/';
 
 	  $http.get(url).success(function(level) {
 		  $scope.level = level;
-		  var game = new Game(angular.element('.render'), level.content);
+
+		  var game = new Game(angular.element('#level'), level.content);
 
 		  $scope.submit = function() {
 			  var data = {source: $scope.source};
@@ -55,15 +55,43 @@ app.controller('level', ['$scope', '$http', '$routeParams',
 				  if (Object.keys(response.interpreted.error).length > 0) {
 					  $scope.error = response.interpreted.error;
 				  } else {
-					  game.reset();
 					  $scope.error = null;
-					  game.walk(response.walk[0]);
+
+					  game.reset();
+					  game.walk(response.walk[0]).call(function() {
+
+						  $('.modal').modal({
+							  backdrop: "static"
+						  });
+
+					  })
+
+					  var is_solved = response.walk[2];
+					  if (is_solved) {
+
+					  }
+
 				  }
 			  });
 		  }
 
+		  $scope.go_restart = function() {
+			  $('.modal').modal('hide');
+			  game.reset();
+		  }
+
+		  $scope.go_continue = function() {
+			  $('.modal').modal('hide');
+			  // Modal bug
+			  $('.modal-backdrop').remove();
+			  $location.path('/');
+		  }
 	  });
 
+	  $scope.counter = 0;
+	  $scope.update_counter = function() {
+		  $scope.counter = $scope.source.replace(/\s|\:|\(|\)|\,/g,'').length;
+	  }
 
   }]);
 
