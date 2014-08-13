@@ -1,10 +1,10 @@
-from collections import OrderedDict
+
 
 LEVELS = [
     {
         "key": "0e91d682d",
         "name": "Level 1",
-        "limits": [10, 7 ,5],
+        "limits": [20, 15, 10],
         "content": [
             ".........",
             ".........",
@@ -20,7 +20,7 @@ LEVELS = [
     {
         "key": "dd59137da",
         "name": "Level 2",
-        "limits": [10, 7 ,5],
+        "limits": [20, 15, 10],
         "content": [
             "2.@......",
             "..*^.....",
