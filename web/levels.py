@@ -4,6 +4,7 @@ _LEVELS = [
     {
         "key": "0e91d682d",
         "name": "Level 1",
+        "limits": [10, 7 ,5],
         "content": """
 
         .........
@@ -21,6 +22,7 @@ _LEVELS = [
     {
         "key": "dd59137da",
         "name": "Level 2",
+        "limits": [10, 7 ,5],
         "content": """
 
         2.@......
@@ -43,6 +45,7 @@ for level in _LEVELS:
     LEVELS.append({
         'key': level['key'],
         'name': level['name'],
+        'limits': level['limits'],
         'content': level['content'].strip().replace(" ", "").split("\n")
     })
 
