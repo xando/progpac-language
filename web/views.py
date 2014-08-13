@@ -3,7 +3,7 @@ import json
 from django.http import JsonResponse, HttpResponseNotFound
 from django.views.generic import View
 
-from herbert import interpreter
+from herbert import interpreter, solve
 
 from . import levels
 
@@ -21,8 +21,10 @@ class Level(View):
             return HttpResponseNotFound()
 
         data = json.loads(request.body)
+
         interpreted = interpreter.interpret(data.get('source', ''))
-        walk = interpreter.walk_world(level['content'], interpreted['code'])
+        walk = solve.walk(level, interpreted['code'], interpreted['length'])
+
         return JsonResponse({
             'interpreted': interpreted,
             'walk': walk
