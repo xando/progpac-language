@@ -90,7 +90,7 @@ app.controller('level', ['$scope', '$http', '$routeParams', '$location',
 
 	  $scope.counter = 0;
 	  $scope.update_counter = function() {
-		  $scope.counter = $scope.source.replace(/\s|\:|\(|\)|\,/g,'').length;
+		  $scope.counter = $scope.source.replace(/\(|\)|\s|\n|\:|\,|\-|\+/g,'').length;
 	  }
 
   }]);
