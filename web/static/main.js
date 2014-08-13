@@ -1,6 +1,6 @@
 
 var app = angular.module(
-	'application', ['ngRoute', 'ngResource'],
+	'application', ['ngRoute', 'ngResource', 'ngCookies'],
 	function($routeProvider, $resourceProvider, $httpProvider) {
 
 		$resourceProvider.defaults.stripTrailingSlashes = false;
@@ -16,19 +16,26 @@ var app = angular.module(
 				templateUrl: '/static/templates/level.html',
 				controller: 'level'
 			});
-
 	});
 
+app.controller('default', ['$scope', '$cookies', '$location',
+  function ($scope, $cookies, $location) {
+	  // debugger
+  }]);
 
-app.controller('index', ['$scope', '$http', '$location',
-  function ($scope, $http, $location) {
+app.controller('index', ['$scope', '$http', '$location', '$cookieStore',
+  function ($scope, $http, $location, $cookieStore) {
 	  var url = '/level/';
 
 	  $http.get(url).success(function(levels) {
 		  $scope.levels_rows = [];
 		  var i,j,temparray,chunk = 3;
 		  for (i=0,j=levels.length; i<j; i+=chunk) {
-			  $scope.levels_rows.push(levels.slice(i,i+chunk))
+			  var slice = levels.slice(i,i+chunk);
+			  for (k=0; k<slice.length; k++) {
+				  slice[k].result = $cookieStore.get(slice[k].key);
+			  }
+			  $scope.levels_rows.push(slice);
 		  }
 	  });
 
@@ -39,17 +46,31 @@ app.controller('index', ['$scope', '$http', '$location',
   }]);
 
 
-app.controller('level', ['$scope', '$http', '$routeParams', '$location',
-  function ($scope, $http, $routeParams, $location) {
+app.controller('level', ['$scope', '$http', '$routeParams', '$location', '$cookieStore',
+  function ($scope, $http, $routeParams, $location, $cookieStore) {
 	  var url = '/level/' + $routeParams.hash + '/';
 
+	  if (!$cookieStore.get($routeParams.hash)) {
+		  $cookieStore.put($routeParams.hash, {
+			  source: "",
+			  score: 0,
+			  length: 0,
+		  })
+	  }
+
 	  $http.get(url).success(function(level) {
+		  var cookie = $cookieStore.get($routeParams.hash);
+		  $scope.source = cookie.source;
+
 		  $scope.level = level;
 		  $scope.score = 0;
 
 		  var game = new Game(angular.element('#level'), level.content);
 
 		  $scope.submit = function() {
+			  cookie.source = $scope.source;
+			  $cookieStore.put($routeParams.hash, cookie);
+
 			  var data = {source: $scope.source};
 
 			  $http.post(url, data).success(function(response) {
@@ -66,10 +87,14 @@ app.controller('level', ['$scope', '$http', '$routeParams', '$location',
 							  });
 							  $scope.$apply(function () {
 								  $scope.score = response.walk[2];
+								  $scope.length = response.interpreted.length;
+
+								  cookie.score = response.walk[2];
+								  cookie.length = response.interpreted.length;
+								  $cookieStore.put($routeParams.hash, cookie);
 							  });
 						  }
 					  })
-
 				  }
 			  });
 		  }

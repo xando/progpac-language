@@ -5,12 +5,18 @@
       <div class="level" ng-click="go(level)">
 	{{ level.name }}
 	<div class="results">
-	  0
+	  {{ level.result.length || 0}}
 	</div>
-	<div class="stars">
-	  <span class="glyphicon glyphicon-star first"></span>
-	  <span class="glyphicon glyphicon-star middle"></span>
-	  <span class="glyphicon glyphicon-star last"></span>
+	<div class="stars" ng-init="score = level.result.score || 0">
+
+	  <span style="color: gold" class="glyphicon glyphicon-star first" ng-show="score > 0"></span>
+	  <span style="color: gold" class="glyphicon glyphicon-star middle" ng-show="score > 1"></span>
+	  <span style="color: gold" class="glyphicon glyphicon-star last" ng-show="score > 2"></span>
+
+	  <span style="color: #ddd" class="glyphicon glyphicon-star first" ng-show="score <= 0"></span>
+	  <span style="color: #ddd" class="glyphicon glyphicon-star middle" ng-show="score <= 1"></span>
+	  <span style="color: #ddd" class="glyphicon glyphicon-star last" ng-show="score <= 2"></span>
+	  
 	</div>
       </div>
     </div>
