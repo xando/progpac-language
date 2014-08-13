@@ -33,12 +33,12 @@ var LAYER_1_Y_SHIFT = -5;
 var LAYER_2_Y_SHIFT = -25;
 
 
-var Game = function(element, world) {
+var Game = function($level, world) {
 	this.world = world;
 
 	var scale = WIDTH / world.length / TILE_WIDTH;
 
-	this.stage = new createjs.Stage("render");
+	this.stage = new createjs.Stage($level.find('#render')[0]);
 	this.stage.scaleX = scale;
 	this.stage.scaleY = scale;
 
@@ -68,7 +68,7 @@ var Game = function(element, world) {
 		createjs.Ticker.setFPS(80);
 		createjs.Ticker.addEventListener("tick", this.stage);
 
-		$('#level').show();
+		$level.show()
 
 	}, this);
 };
@@ -179,22 +179,22 @@ Game.prototype.walk = function(path) {
 			element = path_elements.shift();
 			direction = parseInt(element)
 			tween
-				.wait(50)
+				.wait(30)
 				.set({src: this.resources.getResult('guy'+direction).src}, this.guy.image);
 		}
 		if (element == 's') {
 			if (direction == 0) {
 				y -= TILE_HEIGHT;
-				tween.to({y: y}, 200, createjs.Ease.linear)
+				tween.to({y: y}, 160, createjs.Ease.linear)
 			} else if (direction == 1) {
 				x += TILE_WIDTH;
-				tween.to({x: x}, 200, createjs.Ease.linear)
+				tween.to({x: x}, 160, createjs.Ease.linear)
 			} else if (direction == 2) {
 				y += TILE_HEIGHT;
-				tween.to({y: y}, 200, createjs.Ease.linear)
+				tween.to({y: y}, 160, createjs.Ease.linear)
 			} else if (direction == 3) {
 				x -= TILE_WIDTH;
-				tween.to({x: x}, 200, createjs.Ease.linear)
+				tween.to({x: x}, 160, createjs.Ease.linear)
 			}
 			tween.call(function() {
 				// Naive hit test
@@ -230,4 +230,6 @@ Game.prototype.walk = function(path) {
 
 		}
 	}
+
+	return tween;
 }
