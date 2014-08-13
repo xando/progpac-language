@@ -42,9 +42,11 @@
 	<div class="modal-body">
 	  {{ counter }}
 	  <div class="stars">
-	    <span class="glyphicon glyphicon-star first"></span> 
-	    <span class="glyphicon glyphicon-star middle"></span>
-	    <span class="glyphicon glyphicon-star last"></span>
+	    
+	    <span class="glyphicon glyphicon-star" ng-show="score > 0"></span> 
+	    <span class="glyphicon glyphicon-star" ng-show="score > 1"></span> 
+	    <span class="glyphicon glyphicon-star" ng-show="score > 2"></span> 
+	    
 	  </div>
 
 	</div>

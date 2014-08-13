@@ -45,6 +45,7 @@ app.controller('level', ['$scope', '$http', '$routeParams', '$location',
 
 	  $http.get(url).success(function(level) {
 		  $scope.level = level;
+		  $scope.score = 0;
 
 		  var game = new Game(angular.element('#level'), level.content);
 
@@ -59,17 +60,15 @@ app.controller('level', ['$scope', '$http', '$routeParams', '$location',
 
 					  game.reset();
 					  game.walk(response.walk[0]).call(function() {
-
-						  $('.modal').modal({
-							  backdrop: "static"
-						  });
-
+						  if (response.walk[2] > 0) {
+							  $('.modal').modal({
+								  backdrop: "static"
+							  });
+							  $scope.$apply(function () {
+								  $scope.score = response.walk[2];
+							  });
+						  }
 					  })
-
-					  var is_solved = response.walk[2];
-					  if (is_solved) {
-
-					  }
 
 				  }
 			  });
